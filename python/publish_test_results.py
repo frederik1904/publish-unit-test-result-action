@@ -269,6 +269,8 @@ def main(settings: Settings, gha: GithubAction) -> None:
     try:
         response = http_get(url=f'{settings.api_url}/repos/{settings.repo.split("/")[0]}/{settings.repo.split("/")[1]}/pulls/2',headers=headers,)
         logger.debug(response.status_code)
+        logger.debug(settings.repo.split("/")[0])
+        logger.debug(settings.repo.split("/")[1])
         logger.debug(response.content)
     except Exception as e:
         logging.error("An error occurred while making the API call: %s", str(e), response)
