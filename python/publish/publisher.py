@@ -248,6 +248,9 @@ class Publisher:
             return None
 
         try:
+            logger.debug(self._settings.owner)
+            logger.debug(self._settings.repo)
+            logger.debug(number)
             return RepositoryApi(self._gtea).repo_get_pull_request_with_http_info(self._settings.owner, self._settings.repo, number)
         except UnknownObjectException:
             return None
