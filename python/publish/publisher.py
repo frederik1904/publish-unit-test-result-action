@@ -12,6 +12,7 @@ from github.CheckRun import CheckRun
 from github.CheckRunAnnotation import CheckRunAnnotation
 from github.IssueComment import IssueComment
 
+from publish.gitea_client import IssueApi
 from publish.gitea_client.api_client import ApiClient
 from publish.gitea_client.api import RepositoryApi
 from publish.gitea_client.models import PullRequest
@@ -320,33 +321,6 @@ class Publisher:
             logger.debug(f'found open pull request #{pull.number} with commit {commit} as current head or merge commit')
         return pulls
 
-    def get_stats_from_commit(self, commit_sha: str) -> Optional[UnitTestRunResults]:
-        check_run = self.get_check_run(commit_sha)
-        return self.get_stats_from_check_run(check_run) if check_run is not None else None
-
-    def get_check_run(self, commit_sha: str) -> Optional[CheckRun]:
-        if commit_sha is None or commit_sha == '0000000000000000000000000000000000000000':
-            return None
-
-        commit = None
-        try:
-            commit = self._repo.get_commit(commit_sha)
-        except GithubException as e:
-            if e.status == 422:
-                self._gha.warning(str(e.data))
-            else:
-                raise e
-
-        if commit is None:
-            self._gha.error(f'Could not find commit {commit_sha}')
-            return None
-
-        runs = commit.get_check_runs()
-        # totalCount calls the GitHub API, so better not do this if we are not logging the result anyway
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'found {runs.totalCount} check runs for commit {commit_sha}')
-
-        return self.get_check_run_from_list(list(runs))
 
     def get_check_run_from_list(self, runs: List[CheckRun]) -> Optional[CheckRun]:
         # filter for runs with the same name as configured
@@ -558,15 +532,7 @@ class Publisher:
                         cases: Optional[UnitTestCaseResults] = None):
         # compare them with earlier stats
         base_check_run = None
-        if self._settings.compare_earlier and self._settings.check_run:
-            base_commit_sha = self.get_base_commit_sha(pull_request)
-            if stats.commit == base_commit_sha:
-                # we do not publish a comment when we compare the commit to itself
-                # that would overwrite earlier comments without change stats
-                return pull_request
-            logger.debug(f'comparing against base={base_commit_sha}')
-            base_check_run = self.get_check_run(base_commit_sha)
-        base_stats = self.get_stats_from_check_run(base_check_run) if base_check_run is not None else None
+        base_stats = None
         stats_with_delta = get_stats_delta(stats, base_stats, 'base') if base_stats is not None else stats
         logger.debug(f'stats with delta: {stats_with_delta}')
 
@@ -578,7 +544,8 @@ class Publisher:
         all_tests, skipped_tests = restrict_unicode_list(all_tests), restrict_unicode_list(skipped_tests)
         test_changes = SomeTestChanges(before_all_tests, all_tests, before_skipped_tests, skipped_tests)
 
-        latest_comment = self.get_latest_comment(pull_request)
+        #latest_comment = self.get_latest_comment(pull_request)
+        latest_comment = None
         latest_comment_body = latest_comment.body if latest_comment else None
 
         # are we required to create a comment on this PR?
@@ -592,7 +559,8 @@ class Publisher:
 
         # only create new comment none exists already
         if latest_comment is None:
-            comment = pull_request.create_issue_comment(body)
+            comment = IssueApi(self._gtea).issue_create_comment(self._settings.repo.split("/")[0], self._settings.repo.split("/")[1], body)
+            #comment = pull_request.create_issue_comment(body)
             logger.info(f'Created comment for pull request #{pull_request.number}: {comment.html_url}')
         else:
             self.reuse_comment(latest_comment, body)
