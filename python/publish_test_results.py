@@ -497,7 +497,7 @@ def get_settings(options: dict, gha: GithubAction) -> Settings:
         seconds_between_github_writes=float(seconds_between_github_writes),
         secondary_rate_limit_wait_seconds=float(secondary_rate_limit_wait_seconds),
         search_pull_requests=get_bool_var('SEARCH_PULL_REQUESTS', options, default=False),
-        owner=get_var("REPOSITORY_OWNER")
+        owner=get_var("REPOSITORY_OWNER", options)
     )
 
     check_var(settings.token, 'GITHUB_TOKEN', 'GitHub token')
