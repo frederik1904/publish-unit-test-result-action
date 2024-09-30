@@ -10,11 +10,12 @@ from typing import List, Optional, Union, Mapping, Tuple, Any, Iterable, Callabl
 import github
 import humanize
 import psutil
+from flask import request
 from github.GithubRetry import DEFAULT_SECONDARY_RATE_WAIT
 
 from publish.gitea_client import api_client as gitea_client
 from publish.gitea_client import configuration as gitea_configuration
-
+from requests import get as http_get
 
 import publish.github_action
 from publish import __version__, available_annotations, default_annotations, none_annotations, \
@@ -264,8 +265,16 @@ def main(settings: Settings, gha: GithubAction) -> None:
     # publish the delta stats
     backoff_factor = max(settings.seconds_between_github_reads, settings.seconds_between_github_writes)
 
+    headers = {'Authorization': f'token {settings.token}'}
+
+    try:
+        response = http_get(url=f'{settings.api_url}/repos/{settings.repo.split("/")[0]}/{settings.repo.split("/")[1]}/pulls/2',headers=headers,)
+        logger.debug(response.status_code)
+        logger.debug(response)
+    except Exception as e:
+        logging.error("An error occurred while making the API call: %s", str(e), response)
     config = gitea_configuration.Configuration()
-    config.api_key['access_token'] = settings.token
+    config.api_key['token'] = settings.token
     config.host = settings.api_url
 
 
