@@ -251,7 +251,7 @@ class Publisher:
             logger.debug(self._settings.owner)
             logger.debug(self._settings.repo)
             logger.debug(number)
-            return RepositoryApi(self._gtea).repo_get_pull_request_with_http_info(self._settings.repo.split('/')[0], self._settings.repo.split('/')[1], number)
+            return RepositoryApi(self._gtea).repo_get_pull_request(self._settings.repo.split('/')[0], self._settings.repo.split('/')[1], number)
         except UnknownObjectException:
             return None
 
