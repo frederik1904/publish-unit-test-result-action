@@ -222,18 +222,6 @@ class Publisher:
         # construct publish data (test results)
         data = self.get_publish_data(stats, cases, conclusion)
 
-        # publish the check status
-        if self._settings.check_run:
-            if self._settings.is_fork:
-                # running on a fork, we cannot publish the check, but we can still read before_check_run
-                # bump the version if you change the target of this link (if it did not exist already) or change the section
-                logger.info('This action is running on a pull_request event for a fork repository. '
-                            'Pull request comments and check runs cannot be created, so disabling these features. '
-                            'To fully run the action on fork repository pull requests, see '
-                            f'https://github.com/EnricoMi/publish-unit-test-result-action/blob/{__version__}/README.md#support-fork-repositories-and-dependabot-branches')
-            else:
-                data = self.publish_check(data)
-
         # create data as json
         self.publish_json(data)
 
