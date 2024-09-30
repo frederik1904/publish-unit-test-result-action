@@ -558,6 +558,8 @@ class Publisher:
         body = f'## {title}\n{summary}'
         body_map = {"body": body}
         body_map = json.dumps(body_map)
+        logger.debug(body)
+        logger.debug(body_map)
         # only create new comment none exists already
         if latest_comment is None:
             comment = IssueApi(self._gtea).issue_create_comment(self._settings.repo.split("/")[0], self._settings.repo.split("/")[1], 2, body=body_map)
