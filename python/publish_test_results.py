@@ -10,7 +10,6 @@ from typing import List, Optional, Union, Mapping, Tuple, Any, Iterable, Callabl
 import github
 import humanize
 import psutil
-from flask import request
 from github.GithubRetry import DEFAULT_SECONDARY_RATE_WAIT
 
 from publish.gitea_client import api_client as gitea_client
