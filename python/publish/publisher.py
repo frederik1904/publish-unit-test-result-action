@@ -559,12 +559,11 @@ class Publisher:
         summary = get_long_summary_with_digest_md(stats_with_delta, stats, details_url, test_changes, self._settings.test_changes_limit)
         body = f'## {title}\n{summary}'
         commentOptions = CreateIssueCommentOption(body=body)
+        number = get_json_path(self._settings.event, 'pull_request.number')
 
-        logger.debug(body)
-        logger.debug(commentOptions)
         # only create new comment none exists already
         if latest_comment is None:
-            comment = IssueApi(self._gtea).issue_create_comment(self._settings.repo.split("/")[0], self._settings.repo.split("/")[1], 2, body=commentOptions)
+            comment = IssueApi(self._gtea).issue_create_comment(self._settings.repo.split("/")[0], self._settings.repo.split("/")[1], number, body=commentOptions)
             #comment = pull_request.create_issue_comment(body)
             logger.info(f'Created comment for pull request #{pull_request.number}: {comment.html_url}')
         else:
