@@ -558,8 +558,7 @@ class Publisher:
 
         summary = get_long_summary_with_digest_md(stats_with_delta, stats, details_url, test_changes, self._settings.test_changes_limit)
         body = f'## {title}\n{summary}'
-        commentOptions = CreateIssueCommentOption()
-        commentOptions.body = body
+        commentOptions = CreateIssueCommentOption(body=body)
 
         logger.debug(body)
         logger.debug(commentOptions)
