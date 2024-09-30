@@ -265,7 +265,7 @@ def main(settings: Settings, gha: GithubAction) -> None:
     backoff_factor = max(settings.seconds_between_github_reads, settings.seconds_between_github_writes)
 
     config = gitea_configuration.Configuration()
-    config.api_key = settings.token
+    config.api_key['access_token'] = settings.token
     config.host = settings.api_url
 
 
