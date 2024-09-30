@@ -388,7 +388,7 @@ class Publisher:
         if self._settings.compare_earlier and self._settings.check_run:
             before_commit_sha = get_json_path(self._settings.event, 'before')
             logger.debug(f'comparing against before={before_commit_sha}')
-            before_check_run = self.get_check_run(before_commit_sha)
+            before_check_run = None
             before_stats = self.get_stats_from_check_run(before_check_run) if before_check_run is not None else None
         stats_with_delta = get_stats_delta(stats, before_stats, 'earlier') if before_stats is not None else stats
         logger.debug(f'stats with delta: {stats_with_delta}')
