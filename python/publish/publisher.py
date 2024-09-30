@@ -559,7 +559,7 @@ class Publisher:
 
         # only create new comment none exists already
         if latest_comment is None:
-            comment = IssueApi(self._gtea).issue_create_comment(self._settings.repo.split("/")[0], self._settings.repo.split("/")[1], body)
+            comment = IssueApi(self._gtea).issue_create_comment(self._settings.repo.split("/")[0], self._settings.repo.split("/")[1], 2, body=body)
             #comment = pull_request.create_issue_comment(body)
             logger.info(f'Created comment for pull request #{pull_request.number}: {comment.html_url}')
         else:
