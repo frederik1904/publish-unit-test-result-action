@@ -23,9 +23,9 @@ import tempfile
 import six
 from six.moves.urllib.parse import quote
 
-from publish.gitea_client.configuration import Configuration
-import publish.gitea_client.models
-from swagger_client import rest
+from .configuration import Configuration
+from .models import *
+from . import rest
 
 
 class ApiClient(object):
