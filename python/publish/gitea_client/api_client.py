@@ -25,7 +25,6 @@ from six.moves.urllib.parse import quote
 
 import publish
 from .configuration import Configuration
-import models
 from . import rest
 
 
