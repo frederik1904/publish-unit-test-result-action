@@ -31,6 +31,8 @@ from publish.unittestresults import UnitTestCaseResults, UnitTestRunResults, Uni
     UnitTestRunResultsOrDeltaResults, get_stats_delta, get_diff_value
 import json
 
+from .gitea_client.models import CreateIssueCommentOption
+
 @dataclass(frozen=True)
 class Settings:
     token: str
@@ -556,13 +558,14 @@ class Publisher:
 
         summary = get_long_summary_with_digest_md(stats_with_delta, stats, details_url, test_changes, self._settings.test_changes_limit)
         body = f'## {title}\n{summary}'
-        body_map = {"body": body}
-        body_map = json.dumps(body_map)
+        commentOptions = CreateIssueCommentOption()
+        commentOptions.body = body
+
         logger.debug(body)
-        logger.debug(body_map)
+        logger.debug(commentOptions)
         # only create new comment none exists already
         if latest_comment is None:
-            comment = IssueApi(self._gtea).issue_create_comment(self._settings.repo.split("/")[0], self._settings.repo.split("/")[1], 2, body=body_map)
+            comment = IssueApi(self._gtea).issue_create_comment(self._settings.repo.split("/")[0], self._settings.repo.split("/")[1], 2, body=commentOptions)
             #comment = pull_request.create_issue_comment(body)
             logger.info(f'Created comment for pull request #{pull_request.number}: {comment.html_url}')
         else:
